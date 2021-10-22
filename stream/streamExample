@@ -1,0 +1,85 @@
+What are different ways of iterating collection list in Java 8?
+Ans:
+List<String> notes = new ArrayList<>();
+	notes.add("note1");
+	notes.add("note2");
+	notes.add("note3");
+	notes.add("note4");
+	notes.add("note5");
+
+	//Using lambda expression
+	//Output : note1,note2,note3,note4,note5
+	notes.forEach(note->System.out.println(note));
+
+	//Output : note3
+	notes.forEach(note->{
+		if("note3".equals(note)){
+			System.out.println(note);
+		}
+	});
+
+	//Using Stream and filter
+	//Output : note2
+	notes.stream()
+		.filter(s->s.contains("note2"))
+		.forEach(System.out::println);
+
+	//Using method reference
+	//Output : note1,note2,note3,note4,note5
+	notes.forEach(System.out::println);
+  -----------------------------------------------------------
+  How to check if list is empty in Java 8 using Optional, if not null iterate through the list and print the object?
+Ans:
+
+Optional.ofNullable(noteLst)
+            .orElseGet(Collections::emptyList) // creates empty immutable list: [] in case noteLst is null
+            .stream().filter(Objects::nonNull) //loop throgh each object and consider non null objects
+            .map(note -> Notes::getTagName) // method reference, consider only tag name
+            .forEach(System.out::println); // it will print tag names
+-------------------------------------------------------------------
+How to sort Collection in Java 8?
+//Older way to sort, before java 8
+		noteLst.sort(new Comparator<Notes>() {
+		@Override
+		public int compare(Notes n1, Notes n2) {
+			return n1.getId()-n2.getId();
+		}
+	});	
+public class TestNotes {
+
+    public static void main(String[] args) {
+
+        List<Notes> noteLst = new ArrayList<>();
+        noteLst.add(new Notes(1, "aa", 11));
+        noteLst.add(new Notes(3, "cc", 33));
+        noteLst.add(new Notes(4, "bb", 44));
+		noteLst.add(new Notes(2, "dd", 34));
+        noteLst.add(new Notes(5, "zz", 32));
+
+		// java 8 sort according to id 1,2,3,4,5
+        noteLst.sort((n1, n2)->n1.getId()-n2.getId());
+
+		//java 8 print the notes using lamda
+		noteLst.forEach((note)->System.out.println(note));
+    }
+}
+//Output 
+
+Notes [id=1, tagName=aa, tagId=11]
+Notes [id=2, tagName=dd, tagId=34]
+Notes [id=3, tagName=cc, tagId=33]
+Notes [id=4, tagName=bb, tagId=44]
+Notes [id=5, tagName=zz, tagId=32]
+---------------------------------------
+How to use map to convert object into Uppercase in Java 8?
+Ans:
+//Older way to convert object to uppercase
+		List<String> names = Arrays.asList("aa", "bb", "cc", "dd");
+
+        List<String> uppercaseNames = new ArrayList<>();
+        for (String name : names) {
+            uppercaseNames.add(name.toUpperCase());
+        }
+       // In Java 8
+        List<String> nameLst = names.stream().map(String::toUpperCase).collect(Collectors.toList());
+        System.out.println(nameLst); //output- [AA, BB, CC, DD]
