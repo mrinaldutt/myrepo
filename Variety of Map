@@ -1,0 +1,78 @@
+java.util.WeakHashMap
+Elements in a weak hashmap can be reclaimed by the garbage collector if there are not other strong reference to the object, this makes them useful for caches/lookup storage.
+Keys inserted gets wrapped in java.lang.ref.WeakReference.
+Useful only if the desired lifetime of cache entries is determined by external references to the key, not the values.
+
+Examples:
+class WkHMap{
+public static void main(String args[]){
+	Map<Order, Integer> orders = new WeakHahMap<>();
+	orders.put(new Order(1, "abcd"), 100);//Soft reference
+	orders.put(new Order(2, "abcd"), 200);
+
+	Order o3 = new Order(3, "xyz");//Hard reference with main object
+	orders.put(o3, 300);
+	System.out.println(orders.size());
+
+	System.gc();
+	System.out.println(orders.size());
+}
+}
+o/p: 3, 1
+As the hard reference, thus it is not garbage collected.
+===================================
+Collection.sysnchronizedMap(aMap)
+A convenient "decorator" to create fully synchronized Map".
+Similar to HashTable.
+diff between hashtable and synchornizedmap: 
+hashtable is fail safe iterator where as sysnchronizedMap fail fast iterator.
+hashtable does not allow null key null values whereas one null key and N number of null values. 
+hashtable is a legacy class and not recommended to use where as sysnchronizedMap in Multi threaded environment.
+
+===================================
+java.util.concurrent.ConcurrentHashMap
+supports full concurrency during retrieval. Means, retrival operations do not block even if adds are running concurrency(mostly).
+Reads can happen fast, while writes require a lock. Write lock is acquired at granular level, whole table is not blocked only segments are locked. So a very rare chance of read waiting on write to complete.
+Iterator do not throw concurrent modification exception (with in same thread).
+Can be used in cases whrere a lot of concurrent addition happens followed by or concurrent reads later on.
+Null key not allowed. If map.get(null) returns null, it is not sure if null is not mapped or if null is mapped to a null value. If a non-concuurent map, we could use contains() call, but in concurrent map, values can change between API calls.
+Operation not atomic.
+
+Examples:
+class ConCHMap{
+static Map<String, AtomicLong> orders = new ConcurrentHashMap<>();// Here Atomic Long used to established atomic operation, otherwise on multithreaded environment the output did not consistent.
+
+static void processOrders(){
+for(String city : orders.keySet()){
+for(int i=0;i<50;i++){
+orders.get(city).getAndIncrement()
+}
+}
+}
+
+public static void main(String args[]){
+orders.put("Bombay",new AtomicLong());
+orders.put("Beiljing",new AtomicLong());
+orders.put("London",new AtomicLong());
+orders.put("New York",new AtomicLong());
+
+ExecutorsService service = Executors.newFixedThreadPool(2);
+service.submit(ConCHMap::processOrders);
+service.submit(ConCHMap::processOrders);
+
+service.awaitTermination(1, TimeUnit.SECONDS);
+service.shutdown();
+
+System.out.println(orders);
+
+}
+}
+
+=====================================
+java.util.concurrent.ConcurrentSkipListMap
+Its a equivalent of TreeMap.
+A scalable concurrent  ConcurrentNavigableMap/SortedMap(keys are sorted on natrual ordering) implementation.
+Gurantee average O(log(n)) performance on a wide variety of operations. ConcurrentHashMap does not gurantee operation time as part of contract.
+=====================================
+
+
