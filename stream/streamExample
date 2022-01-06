@@ -83,3 +83,108 @@ Ans:
        // In Java 8
         List<String> nameLst = names.stream().map(String::toUpperCase).collect(Collectors.toList());
         System.out.println(nameLst); //output- [AA, BB, CC, DD]
+
+-------------------------------------------------------------------------------------
+
+package java8;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class JavaFunctionalInterfaceTest {
+	
+	private static int sum(int x, int y) {
+		return x+y;
+	}
+
+	public static void testFunction() {
+		
+		List<Integer> list = Stream.of(1,2,3,4,5,6,7,8,8,9).collect(Collectors.toList());
+		
+		Predicate<Integer> isPredicate = x->x%2==0;
+		Predicate<Integer> isPredicate2 = new Predicate<Integer>() {
+			@Override
+			public boolean test(Integer t) {
+				return t%2==0;
+			}
+		};
+		
+		Function<Integer, Integer> squareFunc = new Function<Integer, Integer>() {
+			@Override
+			public Integer apply(Integer x) {
+				return x*x;
+			}
+		};
+		
+		Consumer<Integer> systemConsume = new Consumer<Integer>() {
+			@Override
+			public void accept(Integer elem) {
+				System.out.println(elem);
+			}
+		};
+		
+		//list.stream().filter(x->x%2==0).map(x->x*x).forEach(System.out::println);
+		list.stream().filter(isPredicate2).map(squareFunc).forEach(systemConsume);
+		
+		BinaryOperator<Integer> binaryOperator = Integer::sum;
+		BinaryOperator<Integer> sumBinaryOperator = new BinaryOperator<Integer>() {
+			@Override
+			public Integer apply(Integer x, Integer y) {
+				return x+y;
+			}};
+		//System.out.println("sum of al numbers "+list.stream().reduce(0, Integer::sum));
+		System.out.println("Sum of all number "+list.stream().reduce(0, sumBinaryOperator));
+		
+	}
+	
+	public static void main(String args[]) {
+		testFunction();
+		
+		List<Integer> list = Stream.of(1,2,3,4,5,6,7,8,9,8).collect(Collectors.toList());
+		
+		System.out.println("Printing all numbers");
+		list.stream().forEach(System.out::println);
+		
+		System.out.println("Printing odd numbers");
+		list.stream().filter(x->x%2!=0).forEach(System.out::println);
+		
+		System.out.println("Printing squared even numbers");
+		list.stream().filter(x->x%2==0).map(x->x*x).forEach(System.out::println);
+		
+		System.out.println("Printing sum of numbers");
+		System.out.println(list.stream().reduce(0,JavaFunctionalInterfaceTest::sum));
+		System.out.println(list.stream().reduce(0, Integer::sum));
+		
+		System.out.println("Printing sum all numbers using lambda");
+		System.out.println(list.stream().reduce(0,(x,y)->x+y));
+		
+		System.out.println("Printing last number");
+		System.out.println(list.stream().reduce(0,(x,y)->y));
+		
+		System.out.println("Printing max number");
+		System.out.println(list.stream().reduce(0,(x,y)->x>y?x:y));
+		
+		System.out.println("Printing sum of square root of numbers");
+		System.out.println(list.stream().map(x->x*x).reduce(0,(x,y)->x+y));
+		System.out.println(list.stream().map(x->x*x).reduce(0, Integer::sum));
+		
+		System.out.println("Printing all distinct numbers");
+		list.stream().distinct().forEach(System.out::println);
+		
+		System.out.println("Printing all sorted numbers");
+		list.stream().sorted().forEach(System.out::println);
+		
+		System.out.println("Printng all numbers in reverse order");
+		list.stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);
+		
+		
+	}
+	
+}
+	
